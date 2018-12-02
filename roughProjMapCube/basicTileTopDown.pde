@@ -47,9 +47,6 @@ class Tile {
     case 3:
       chooseSide(side2);
       break;
-    case 4:
-      chooseSide(secondTop);
-      break;
     }
 
     if (frameCount % 2 == 0 && saturation+tempSaturation > 0 && canFade == true) {

@@ -13,7 +13,7 @@ class Player {
   boolean canLeft = true, canRight = true;
   boolean canFall = true;
   int fallTimer;
-  int mode = 1;
+  int mode = 2;
   float resolveSpeed;
   Area hbox;
 

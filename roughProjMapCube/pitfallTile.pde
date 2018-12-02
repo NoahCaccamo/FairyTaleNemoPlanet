@@ -70,9 +70,6 @@ class pitfallTile extends Tile {
     case 3:
       chooseSide(side2, players);
       break;
-    case 4:
-      chooseSide(secondTop, players);
-      break;
     }
   }
 }
