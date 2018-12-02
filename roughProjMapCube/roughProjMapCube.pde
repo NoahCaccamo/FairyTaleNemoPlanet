@@ -12,6 +12,8 @@ String text1="";
 PFont monoSpaced;
 float totalHeightTXT;
 
+float entryNum;
+
 int sc1X = 1920;
 int sc2X = 1280;
 int sc1Y = 1080;
@@ -46,6 +48,8 @@ ArrayList<mushroomTile> mushroomTiles = new ArrayList<mushroomTile>();
 
 //planet 2
 ArrayList<Tile> secondTiles = new ArrayList<Tile>();
+
+ArrayList<Player> players = new ArrayList<Player>();
 
 Player p1; 
 
@@ -113,6 +117,7 @@ void setup() {
   txtScreen1 = createGraphics(600, 1800, P3D);
 
   p1 = new Player(40, 1, 1, 5, 1);
+  players.add(new Player(40, 1, 1, 5, 1));
 }
 
 
@@ -231,6 +236,15 @@ void draw() {
 
   txtScreen1.endDraw();
   surface5.render(txtScreen1);
+  
+  ////////////////////
+  entryNum = entries.size() /2;
+  if (int(entryNum) > players.size()) {
+    PVector tempVec = securePos(0, 800, 0, 800, 100);
+    
+   players.add(new Player(40, tempVec.x, tempVec.y, 0, 1));
+  }
+  
 }
 
 
@@ -245,7 +259,7 @@ void draw() {
 void keyPressed() { //add new person on key press 
   if (key != DELETE && key != BACKSPACE && key != ENTER && keyCode != SHIFT && key != TAB) {
     text1+=key;
-  } else if (key == ENTER) {
+  } else if (key == ENTER && text1.length()>0) {
     if (text1.length() <=49) {
       entries.append(text1);
     } else {
@@ -267,9 +281,10 @@ void keyPressed() { //add new person on key press
         entries.append(tempText);
         tempText = "";
       }
-            entries.append("/n");
+ //entries.append("/n");           
     }
     text1 = ("");
+    entries.append("/n");
   } else if (key == BACKSPACE) {
     if (text1.length() > 0) {
       text1 = text1.substring (  0, text1.length()-1  );
@@ -305,7 +320,10 @@ void updateTiles(int selectedArray) {
     basicTopCompletion = 0;
     for (int i=0; i < tiles.size(); i++) {
       Tile getTile = tiles.get(i);
-      getTile.proximityColor(p1);
+      for(int p=0; p < players.size(); p++){
+        Player getPlayer = players.get(p);
+               getTile.proximityColor(getPlayer);
+      }
       getTile.display();
       basicTopCompletion += getTile.saturation;
     }
