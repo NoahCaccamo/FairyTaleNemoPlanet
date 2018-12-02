@@ -1,16 +1,20 @@
-import deadpixel.keystone.*;
+import deadpixel.keystone.*; //54 lines per 1080
 import java.awt.geom.*;
 import java.awt.*;
 
 Keystone ks;
 CornerPinSurface surface1, surface2, surface3, surface4, surface5, surface6;
 
-StringList entries;
+StringList entries, entries2;
+
+boolean listFull = false;
+boolean mishonCompree = false;
+
 
 String text1="";
 
 PFont monoSpaced;
-float totalHeightTXT;
+float totalHeightTXT, totalHeightTXT2;
 
 float entryNum;
 
@@ -50,6 +54,8 @@ ArrayList<mushroomTile> mushroomTiles = new ArrayList<mushroomTile>();
 ArrayList<Tile> secondTiles = new ArrayList<Tile>();
 
 ArrayList<Player> players = new ArrayList<Player>();
+ArrayList<Player> players2 = new ArrayList<Player>();
+ArrayList<Player> players3 = new ArrayList<Player>();
 
 Player p1; 
 
@@ -85,6 +91,7 @@ void setup() {
   rectMode(CENTER);
 
   entries = new StringList();
+  entries2 = new StringList();
 
   monoSpaced = createFont("Courier", 20);
 
@@ -104,7 +111,8 @@ void setup() {
   surface3 = ks.createCornerPinSurface(sideSize, sideSize, 20);
 
   surface4 = ks.createCornerPinSurface(1920, 1080, 20);
-  surface5 = ks.createCornerPinSurface(600, 1800, 20);
+  surface5 = ks.createCornerPinSurface(600, 1080, 20);
+  surface6 = ks.createCornerPinSurface(600, 1080, 20);
 
 
   top = createGraphics(topSize, topSize, P3D);
@@ -114,10 +122,11 @@ void setup() {
   side2 = createGraphics(sideSize, sideSize, P3D);
   side2.rectMode(CENTER);
   compScreen = createGraphics(1920, 1080, P3D);
-  txtScreen1 = createGraphics(600, 1800, P3D);
+  txtScreen1 = createGraphics(600, 1080, P3D);
+  txtScreen2 = createGraphics(600, 1080, P3D);
 
-  p1 = new Player(40, 1, 1, 5, 1);
-  players.add(new Player(40, 1, 1, 5, 1));
+  //p1 = new Player(40, 1, 1, 5, 1);
+ // players.add(new Player(40, 1, 1, 5, 1));
 }
 
 
@@ -128,10 +137,10 @@ void draw() {
 
   if (frameCount == 1) frame.setLocation(0, 0);
 
-  p1.canLeft = true;
-  p1.canRight = true;
+  //p1.canLeft = true;
+  //p1.canRight = true;
   background(0);
-  p1.move();
+  //p1.move();
 
   clear();
   /////////////TOP DRAW/////////////////////////////////////
@@ -147,7 +156,7 @@ void draw() {
   //update pitfall tiles
   updateTiles(10);
 
-  p1.display();
+  //p1.display();
   top.endDraw();
   surface1.render(top);
   ////////////////////SIDE 1 DRAW//////////////////////////////////////////
@@ -162,7 +171,7 @@ void draw() {
   //Update Platform Tiles
   updateTiles(3);
 
-  p1.display();
+  //p1.display();
 
   //foreground update
   updateTiles(4);
@@ -179,7 +188,7 @@ void draw() {
   //update Platform Tiles
   updateTiles(6);
 
-  p1.display();
+  //p1.display();
 
   //update crystal tiles
   updateTiles(5);
@@ -206,7 +215,6 @@ void draw() {
   //txtScreen1.textAlign(LEFT,TOP);
   txtScreen1.rectMode(CORNER);
   totalHeightTXT = 0;
-  println(txtScreen1.width);
   
   for (int i=0; i < entries.size(); i++) {
     float tempWidth = 0;
@@ -238,12 +246,84 @@ void draw() {
   surface5.render(txtScreen1);
   
   ////////////////////
-  entryNum = entries.size() /2;
-  if (int(entryNum) > players.size()) {
-    PVector tempVec = securePos(0, 800, 0, 800, 100);
-    
-   players.add(new Player(40, tempVec.x, tempVec.y, 0, 1));
+  txtScreen2.beginDraw();
+   txtScreen2.background(0);
+  txtScreen2.textSize(20);
+  txtScreen2.textFont(monoSpaced);
+  //txtScreen1.textAlign(LEFT,TOP);
+  txtScreen2.rectMode(CORNER);
+  totalHeightTXT2 = 0;
+  
+   for (int i=0; i < entries2.size(); i++) {
+    float tempWidth = 0;
+    float tempHeight = 0;
+    int counter = 0;
+    String getEntry = entries2.get(i);
+
+    float fakeTempWidth = textWidth(getEntry);
+    if (textWidth(getEntry) > txtScreen2.width) {
+      do {
+        counter++;
+        fakeTempWidth = textWidth(getEntry) / counter;
+        tempHeight = 40 * counter;
+      } while (fakeTempWidth > txtScreen2.width);
+    } else {
+      tempWidth = textWidth(getEntry);
+      tempHeight = 40;
+    }
+
+    totalHeightTXT2 += tempHeight;
+    txtScreen2.fill(100);
+    // txtScreen1.rect(0, (20*i), tempWidth, tempHeight);
+    txtScreen2.fill(255);
+    txtScreen2.text(getEntry, 0, 20*i, txtScreen1.width, tempHeight+ 20);
+    text(getEntry, 0, 35*i);
   }
+  
+  txtScreen2.endDraw();
+  surface6.render(txtScreen2);
+  
+  /////////////////////////////////////
+  entryNum = (entries.size() + entries2.size()) * 2 ;  //ADJUST VALUES HERE
+  
+  if (int(entryNum) > players.size() + players2.size() + players3.size()) {
+    int sideChosen = (int) random(1,4);
+    PVector tempVec = new PVector (0,0);
+    PVector compVec = new PVector(0,0);
+    //println(sideChosen);
+    
+    if (sideChosen == 1) {
+    tempVec = securePos(0, 800, 0, 800, 100, 0);
+    if (tempVec == compVec){
+      sideChosen = 2;
+    }
+    if (sideChosen == 1) {
+    players.add(new Player(40, tempVec.x, tempVec.y, 0, sideChosen));
+    }
+    }if (sideChosen == 2) {
+      tempVec = securePos2(0, 800, 0, 800, 100, 0);
+      if (tempVec == compVec){
+      sideChosen = 3;
+    }
+    if (sideChosen == 2) {
+      players2.add(new Player(40, tempVec.x, tempVec.y, 0, sideChosen));
+    }
+    }if (sideChosen == 3) {
+      tempVec = securePos3(20, 780, 20, 780, 100, 0);
+      players3.add(new Player(40, tempVec.x, tempVec.y, 0, sideChosen));
+    }
+    
+   
+  }
+  
+  if (entries.size() >= 51) {
+   listFull = true; 
+  }
+  if (entries.size() + entries2.size() >= 74) {
+    mishonCompree = true;
+  }
+  
+  //println(entries.size(), entries2.size(), players.size()
   
 }
 
@@ -261,30 +341,50 @@ void keyPressed() { //add new person on key press
     text1+=key;
   } else if (key == ENTER && text1.length()>0) {
     if (text1.length() <=49) {
+      if (listFull == false){
       entries.append(text1);
+      }else {
+       entries2.append(text1); 
+      }
     } else {
       String tempText = "";
       for (int i=0; i < text1.length(); i++) {
         tempText += text1.charAt(i);
         if (tempText.length() > 40 && tempText.length() < 49) {
          if (text1.charAt(i) == ' ' || text1.charAt(i) == '.' || text1.charAt(i) == '!' || text1.charAt(i) == '?') {
+           if (listFull == false) {
             entries.append(tempText);
+           } else {
+            entries2.append(tempText); 
+           }
             tempText = "";
           } 
         }
         if (tempText.length() == 49) {
+          if (listFull == false) {
             entries.append(tempText);
+          }else {
+           entries2.append(tempText); 
+          }
             tempText = "";
       }
     }
     if (tempText.length() > 0) {
+      if (listFull == false) {
         entries.append(tempText);
+      }else {
+       entries2.append(tempText); 
+      }
         tempText = "";
       }
  //entries.append("/n");           
     }
     text1 = ("");
+    if (listFull == false) {
     entries.append("/n");
+    }else {
+      entries2.append("/n");
+    }
   } else if (key == BACKSPACE) {
     if (text1.length() > 0) {
       text1 = text1.substring (  0, text1.length()-1  );
@@ -316,7 +416,7 @@ void keyPressed() { //add new person on key press
 
 void updateTiles(int selectedArray) {
   switch (selectedArray) {
-  case 0:
+  case 0: //WORKS
     basicTopCompletion = 0;
     for (int i=0; i < tiles.size(); i++) {
       Tile getTile = tiles.get(i);
@@ -324,41 +424,62 @@ void updateTiles(int selectedArray) {
         Player getPlayer = players.get(p);
                getTile.proximityColor(getPlayer);
       }
+      if (mishonCompree == true) {
+       getTile.saturation = 100; 
+      }
       getTile.display();
       basicTopCompletion += getTile.saturation;
     }
     basicTopCompletion /= tiles.size();
     break;
 
-  case 1:
+  case 1: //WORKS
     waterTopCompletion = 0;
     for (int i=0; i < waterTiles.size(); i++) {
       waterTile getTile = waterTiles.get(i);
-      getTile.proximityColor(p1);
+      for(int p=0; p < players.size(); p++){
+        Player getPlayer = players.get(p);
+               getTile.proximityColor(getPlayer);
+      }
+      if (mishonCompree == true) {
+       getTile.saturation = 100; 
+      }
       getTile.display();
       waterTopCompletion += getTile.saturation;
     }
     waterTopCompletion /= waterTiles.size();
     break;
 
-  case 2:
+  case 2: //WORKS
     bgSide1Completion = 0;
     for (int i=0; i < bgTiles.size(); i++) {
       bgTile getTile = bgTiles.get(i);
-      getTile.proximityColor(p1);
+      for(int p=0; p < players2.size(); p++){
+        Player getPlayer = players2.get(p);
+               getTile.proximityColor(getPlayer);
+      }
+      if (mishonCompree == true) {
+       getTile.saturation = 100; 
+      }
       getTile.display();
       bgSide1Completion += getTile.saturation;
     }
     bgSide1Completion /= bgTiles.size();
     break;
 
-  case 3:
+  case 3: //WORKS
     platformSide1Completion = 0;
     for (int i=0; i < Ptiles.size(); i++) {
       PlatformTile getTile = Ptiles.get(i);
-      getTile.proximityColor(p1);
+      for(int p=0; p < players2.size(); p++){
+        Player getPlayer = players2.get(p);
+               getTile.proximityColor(getPlayer);
+      }
+      if (mishonCompree == true) {
+       getTile.saturation = 100; 
+      }
       getTile.display();
-      getTile.playerCollision();
+     // getTile.playerCollision();
       platformSide1Completion += getTile.saturation;
     }
     platformSide1Completion /= Ptiles.size();
@@ -368,7 +489,10 @@ void updateTiles(int selectedArray) {
     fgSide1Completion = 0;
     for (int i=0; i < fgTiles.size(); i++) {
       fgTile getTile = fgTiles.get(i);
-      getTile.proximityColor(p1);
+      for(int p=0; p < players.size(); p++){
+        Player getPlayer = players.get(p);
+               getTile.proximityColor(getPlayer);
+      }
       getTile.display();
       fgSide1Completion += getTile.saturation;
     }
@@ -379,30 +503,45 @@ void updateTiles(int selectedArray) {
     crystalSide2Completion = 0;
     for (int i=0; i < crystalTiles.size(); i++) {
       crystalTile getTile = crystalTiles.get(i);
-      getTile.proximityColor(p1);
+      for(int p=0; p < players.size(); p++){
+        Player getPlayer = players.get(p);
+               getTile.proximityColor(getPlayer);
+      }
       getTile.display();
       crystalSide2Completion += getTile.saturation;
     }
     crystalSide2Completion /= crystalTiles.size();
     break;
 
-  case 6:
+  case 6:  // WORKS
     platformSide2Completion = 0;
     for (int i=0; i < PtilesSide2.size(); i++) {
       PlatformTile getTile = PtilesSide2.get(i);
-      getTile.proximityColor(p1);
+      for(int p=0; p < players3.size(); p++){
+        Player getPlayer = players3.get(p);
+               getTile.proximityColor(getPlayer);
+      }
+      if (mishonCompree == true) {
+       getTile.saturation = 100; 
+      }
       getTile.display();
-      getTile.playerCollision();
+   //   getTile.playerCollision();
       platformSide2Completion += getTile.saturation;
     }
     platformSide2Completion /= PtilesSide2.size();
     break;
 
-  case 7:
+  case 7: // WORKS
     bgSide2Completion = 0;
     for (int i=0; i < bgTilesSide2.size(); i++) {
       bgTile getTile = bgTilesSide2.get(i);
-      getTile.proximityColor(p1);
+      for(int p=0; p < players3.size(); p++){
+        Player getPlayer = players3.get(p);
+               getTile.proximityColor(getPlayer);
+      }
+      if (mishonCompree == true) {
+       getTile.saturation = 100; 
+      }
       getTile.display();
       bgSide2Completion += getTile.saturation;
     }
@@ -413,7 +552,10 @@ void updateTiles(int selectedArray) {
     mushroomSide2Completion = 0;
     for (int i=0; i < mushroomTiles.size(); i++) {
       mushroomTile getTile = mushroomTiles.get(i);
-      getTile.proximityColor(p1);
+      for(int p=0; p < players.size(); p++){
+        Player getPlayer = players.get(p);
+               getTile.proximityColor(getPlayer);
+      }
       getTile.display();
       mushroomSide2Completion += getTile.saturation;
     }
@@ -424,7 +566,10 @@ void updateTiles(int selectedArray) {
     secondTopCompletion = 0;
     for (int i=0; i < secondTiles.size(); i++) {
       Tile getTile = secondTiles.get(i);
-      getTile.proximityColor(p1);
+      for(int p=0; p < players.size(); p++){
+        Player getPlayer = players.get(p);
+               getTile.proximityColor(getPlayer);
+      }
       getTile.display();
       secondTopCompletion += getTile.saturation;
     }

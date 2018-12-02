@@ -80,9 +80,9 @@ class Tile {
         maxSaturation = 0;
       }
       float valueAdd =  map(distPlayer(player), 0, 125, 2, 0);
-      if (side == 3) {
-        valueAdd = map(distPlayer(player), 0, 400, 2, 0);
-      }
+      //if (side == 3) {
+      //  valueAdd = map(distPlayer(player), 0, 400, 2, 0);
+      //}
       if (valueAdd > 0) {
         canFade = false;
         if (saturation+tempSaturation < 100 && saturation+tempSaturation < maxSaturation && player.mode == 1) {

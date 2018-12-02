@@ -1,5 +1,6 @@
 class waterTile extends Tile {
 
+    waterTile() {}
   waterTile(float ixpos, float iypos, float isize, int iside) {
     xpos = ixpos;
     ypos = iypos;
